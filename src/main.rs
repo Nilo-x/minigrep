@@ -1,19 +1,17 @@
-use std::{env, fs};
+use std::{env, process};
+
+use minigrep::{run, Config};
 
 fn main() {
     let args: Vec<String> = env::args().collect();
 
-    let file_path = &args[1];
-    let search_query = &args[2];
+    let config = Config::build(&args).unwrap_or_else(|err| {
+        println!("problem causing args: {}", err);
+        process::exit(1)
+    });
 
-    println!("arg 1: {}", file_path);
-    println!("arg 2: {}", search_query);
-
-    let file_content = fs::read_to_string(file_path).expect("couldn't read file");
-
-    let result = file_content.contains(search_query);
-
-    if result {
-        println!("file contains the word: \"{}\"", search_query);
+    if let Err(e) = run(config) {
+        println!("Application error: {}", e);
+        process::exit(1)
     }
 }
